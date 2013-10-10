@@ -1,11 +1,11 @@
 all: Sqrt
 
-OBJS = sqrt.o
-LIBS= -lm
+OBJS = 
+LIBS= -lpthread -lm
 CC = gcc
 
-Sqrt: sqrt.o ${OBJS}
-	${CC} -o $@ sqrt.o ${OBJS} ${LIBS}
+Sqrt: sqrt.o
+	${CC} -o $@ sqrt.o ${LIBS}
 
 clean:
 	rm -rf *o Sqrt

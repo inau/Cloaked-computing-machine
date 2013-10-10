@@ -1,16 +1,23 @@
-
 #include <pthread.h>
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
 
-double sum; /* this data is shared by the thread(s) */
-void *runner(void *param); /* threads call this function */
+double sum;
+void *runner(void *param);
+
+typedef struct workload {
+    int _begin;
+    int _end;
+    double _result;
+} Workload;
 
 int main(int argc, char *argv[]) {
-    pthread_t tid; /* the thread identifier */
-    pthread_attr_t attr; /* set of thread attributes */
+    int start = time(NULL);
+    pthread_t tid;
+    pthread_attr_t attr;
 
-    if (argc != 2) {
+    if (argc < 2) {
         fprintf(stderr, "usage: a.out <integer value>\n");
         return -1;
     }
@@ -20,26 +27,55 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    /* get the default attributes */
-    pthread_attr_init(&attr);
-
-    /* create the thread */
-    pthread_create(&tid, &attr, runner, argv[1]);
-
-    /* wait for the thread to exit */
-    pthread_join(tid, NULL);
-
-    printf("sum = %f\n", sum);
-}
-
-/* The thread will begin control in this function */
-void *runner(void *param) {
-    
-    int i, upper = atoi(param);
+    if (argc > 2 && atoi(argv[2]) <= 0) {
+        fprintf(stderr, "%d must assign > 0 threads \n", atoi(argv[2]));
+        return -1;
+    }
+    int MAXPROCESSES = atoi(argv[2]);
+    int MAXCALCS = atoi(argv[1]);
     sum = 0;
-    for (i = 1; i <= upper; i++)
-        sum += sqrt(i);
 
-    pthread_exit(0);
+    pthread_t tids[MAXPROCESSES];
+    
+    /* Get default attributes */
+    pthread_attr_init(&attr);
+    int blocksize;
+    
+    if (MAXCALCS % MAXPROCESSES != 0) {
+         blocksize = MAXCALCS / MAXPROCESSES;
+    }
 
-}
+    else {
+        blocksize = MAXCALCS / MAXPROCESSES;
+        Workload *w = NULL;
+        int t = 0, i = 0;
+        for (i; i < MAXPROCESSES; i + blocksize) {
+            w->_begin = i;
+            w->_end = i + blocksize;
+            /* Create the thread */
+            pthread_create(&tid, &attr, runner, (void *)w);
+            tids[t++] = tid;
+        }
+
+
+
+        /* Wait for the thread to exit */
+        pthread_join(tid, NULL);
+
+        printf("sum = %f\n", sum);
+
+        int end = time(NULL);
+        printf("Time spent %d \n", (end - start));
+    }
+
+    /* The thread will begin control in this function */
+    void *runner(void *param) {
+        int i = (Workload)param->_begin;
+        int upper = (Workload)param->_end;
+        (Workload)param->_result = 0;
+
+        for (i = 1; i <= upper; i++)
+            (Workload)param->_result += sqrt(i);
+
+        pthread_exit(0);
+    }
