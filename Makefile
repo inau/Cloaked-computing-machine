@@ -1,11 +1,11 @@
-all: CShell
+all: Sqrt
 
 OBJS = sqrt.o
 LIBS= -lm
 CC = gcc
 
-CShell: CShell.o ${OBJS}
-	${CC} -o $@ CShell.o ${OBJS} ${LIBS}
+Sqrt: sqrt.o ${OBJS}
+	${CC} -o $@ sqrt.o ${OBJS} ${LIBS}
 
 clean:
-	rm -rf *o CShell
+	rm -rf *o Sqrt
