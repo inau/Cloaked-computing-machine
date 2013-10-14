@@ -1,0 +1,59 @@
+\chapter{Multithreaded Sum}
+
+\section{Requirements}
+
+\begin{itemize}
+\item Calculate the sum of the roots of numbers 0..N
+\item Use multiple threads to do so
+\end{itemize}
+
+\section{Solution}
+we have used a code snippet from our course book(Operating System Concepts 9th edition P. 171) which we based our solution on.
+
+The major alteration is in the form of us adding a struct to contain information about each processes 'workload', this way we pass them in as the runners arguments and can access them in the sub processes.
+
+\section{Testing}
+
+\definecolor{gr1}{gray}{0.65}
+\definecolor{gr2}{gray}{0.85}
+
+
+\newcommand{\tblhead}[1] {
+\multicolumn{2}{l}{#1}\\
+\hline
+}
+
+\newcommand{\row}[2] {
+\hline
+\rowcolor{gr1}
+Inputs&\\
+\hline \hline
+\rowcolor{gr2}
+Calculations: & #1 \\
+\hline
+\rowcolor{gr2}
+Threads: & #2 \\
+\hline \hline
+}
+
+\newcommand{\botrow}[2] {
+\hline
+\rowcolor{gr1}
+Inputs&\\
+\hline \hline
+\rowcolor{gr2}
+Calculations: & #1 \\
+\hline
+\rowcolor{gr2}
+Threads: & #2 \\
+\hline
+}
+
+\begin{table}
+\begin{tabular}{| p{\dimexpr.2\textwidth} | p{\dimexpr.5\textwidth-4\tabcolsep} |}
+\tblhead{Results}
+\row{42}{33}
+\row{55}{666.99}
+\botrow{8934}{76}
+\end{tabular}
+\end{table}
