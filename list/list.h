@@ -8,6 +8,8 @@
 #ifndef _LIST_H
 #define _LIST_H
 
+#include <pthread.h>
+
 /* structures */
 typedef struct node {
   void *elm; /* use void type for generality; we cast the element's type to void type */
@@ -18,6 +20,7 @@ typedef struct list {
   int len;
   Node *first;
   Node *last;
+  pthread_mutex_t lock;
 } List;
 
 /* functions */
