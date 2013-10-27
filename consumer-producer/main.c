@@ -100,6 +100,12 @@ void *producer(void *param) {
 	while(numproducts < maxproducts){
 		sem_wait(&empty);
 		sem_wait(&mutex);
+		if (numproducts >= maxproducts) {
+			printf("\tBreaking out of while loop!\n");
+			sem_post(&mutex);
+			sem_post(&full);
+			break;
+		}
 		n = node_new();
 		n->elm = malloc(sizeof(int));
 		*((int*)n->elm) = numproducts;
