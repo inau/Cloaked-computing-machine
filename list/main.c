@@ -20,32 +20,32 @@ List *fifo;
 int main(int argc, char* argv[])
 {
 	
-	if (argc > 0 && atoi(argv[1]) <= 0) {
-      fprintf(stderr, "%d must be > 0\n", atoi(argv[1]));
-      return -1;
+  if (argc > 0 && atoi(argv[1]) <= 0) {
+    fprintf(stderr, "%d must be > 0\n", atoi(argv[1]));
+    return -1;
   }
   
   int nbthreads = atoi(argv[1]); // Get the number of threads...
   
   printf("Number of threads: %d\n", nbthreads);
 
-	// Create list.
-	fifo = list_new();
+  // Create list.
+  fifo = list_new();
 
-	//initializing list for pids
+  //initializing list for pids
   pthread_t tids[nbthreads];
   
-	pthread_t tid;
+  pthread_t tid;
   pthread_attr_t attr;
   
   /* Get default attributes */
   pthread_attr_init(&attr);
   
-	int i, t = 0;
-	for (i = 0; i < nbthreads; i++) {
-      /* Create the thread */
-      pthread_create(&tid, &attr, runner, NULL);
-      tids[t++] = tid;
+  int i, t = 0;
+  for (i = 0; i < nbthreads; i++) {
+  /* Create the thread */
+  pthread_create(&tid, &attr, runner, NULL);
+  tids[t++] = tid;
   }
   
   //Joining all the tids
@@ -61,18 +61,20 @@ int main(int argc, char* argv[])
 
 // Add something to the list and remove something.
 void *runner(void *param) {
-	Node *n = node_new();
-	n->elm = malloc(sizeof(int));
-	*((int*)n->elm) = num++;
-	list_add(fifo, n);
-	
-	printf(" Going to sleep!\n");
-	sleep(1); // Make the thread sleep in order to make way for some other ones.
-	printf(" Waking up from sleep\n");
-	
-	Node *n2 = list_remove(fifo);
-	if (n2 == NULL) { printf("Error no elements in list\n"); exit(-1);}
-	printf("Element: %d\n", *((int*)n2->elm));
-	free(n2->elm);
+  Node *n = node_new();
+  n->elm = malloc(sizeof(int));
+  *((int*)n->elm) = num++;
+  list_add(fifo, n);
+
+  printf(" Going to sleep!\n");
+  sleep(1); // Make the thread sleep in order to make way for some other ones.
+  printf(" Waking up from sleep\n");
+
+  Node *n2 = list_remove(fifo);
+  if (n2 == NULL) { printf("Error no elements in list\n"); exit(-1);}
+  printf("Element: %d\n", *((int*)n2->elm));
+  free(n2->elm);
+
+  return 0;
 }
 
