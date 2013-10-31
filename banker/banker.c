@@ -12,17 +12,17 @@ typedef struct state {
 } State;
 
 // Global variables
-int m, n;	// m = col, n = row
+int row, col;	// m = row, n = col
 State *s = NULL;
 
 // Print available vector.
 void printAvailable() {
 	int i,j;
 	printf("Availability vector:\n");
-  for(i = 0; i < n; i++)
+  for(i = 0; i < col; i++)
     printf("R%d ", i+1);
   printf("\n");
-  for(j = 0; j < n; j++)
+  for(j = 0; j < col; j++)
     printf("%d  ",s->available[j]);
   printf("\n");
 }
@@ -31,10 +31,10 @@ void printAvailable() {
 void printRequest(int* request) {
 	int i,j;
 	printf("Request vector:\n");
-  for(i = 0; i < n; i++)
+  for(i = 0; i < col; i++)
     printf("R%d ", i+1);
   printf("\n");
-  for(j = 0; j < n; j++)
+  for(j = 0; j < col; j++)
     printf("%d  ",request[j]);
   printf("\n");
 }
@@ -52,8 +52,51 @@ void Sleep(float wait_time_ms)
 
 /* Check if state is safe */
 int stateSafeCheck() {
-	int *work = (int *) malloc(m*sizeof(int));
-  int *finish = (int *) malloc(n*sizeof(int));
+	int *work = (int *) malloc(col*sizeof(int));
+  int *finish = (int *) malloc(row*sizeof(int));
+  
+  int i, j, l;
+  l = col > row ? col : row;
+  // Step 1.
+  for (i = 0; i < l; i++) {
+  	if (i < row)
+  	{
+  		finish[i] = 0;
+  	}
+  	if (i < col)
+  	{
+  		work[i] = s->available[i];
+  	}
+  }
+  
+  for (i = 0; i < row; i++) {
+  	for (j = 0; j < col; j++)
+  	{
+  		// Step 2.
+  		if (finish[i] == 0 && s->need[i][j] <= work[j]) {
+  			// Step 3.
+  			work[j] = work[j] + s->allocation[i][j];
+  			finish[i] = 1;
+  		} else {
+  			break; // Goto step 4 (not safe).
+  		}
+  	}
+  }
+  
+  // Step 4
+  // If finish is true in all instances, the state is safe.
+  for (i = 0; i < row; i++)
+  {
+  	if (finish[i] == 0)
+  	{
+  		printf("State is not safe!\n");
+  		return 0;
+  	}
+  }
+  
+  printf("State is safe!\n");
+  return 1;
+  
 }
 
 /* Allocate resources in request for process i, only if it 
@@ -62,8 +105,12 @@ int resource_request(int i, int *request)
 {
 
 	printRequest(request);
+	if (stateSafeCheck() == 0)
+	{
+		return 0;
+	}
 	int j;
-	for (j = 0; j < n; j++) {
+	for (j = 0; j < col; j++) {
 		// Step 1.
 		if (request[j] > s->need[i][j]) {
 			//ERROR
@@ -72,7 +119,7 @@ int resource_request(int i, int *request)
 		}
 	}
 	
-	for (j = 0; j < n; j++) {
+	for (j = 0; j < col; j++) {
 		// Step 2.
 		while (request[j] > s->available[j]) {
 			//ERROR
@@ -99,7 +146,7 @@ void resource_release(int i, int *request)
 	printf("RELEASING RESOURCES!\n");
 	printRequest(request);
 	int j;
-	for (j = 0; j < n; j++) {
+	for (j = 0; j < col; j++) {
 		s->available[j] -= request[j];
 		s->allocation[i][j] -= request[j];
 		s->need[i][j] -= request[j];
@@ -114,7 +161,7 @@ void generate_request(int i, int *request)
 {
   int j, sum = 0;
   while (!sum) {
-    for (j = 0;j < n; j++) {
+    for (j = 0;j < col; j++) {
       request[j] = s->need[i][j] * ((double)rand())/ (double)RAND_MAX;
       sum += request[j];
     }
@@ -127,7 +174,7 @@ void generate_release(int i, int *request)
 {
   int j, sum = 0;
   while (!sum) {
-    for (j = 0;j < n; j++) {
+    for (j = 0;j < col; j++) {
       request[j] = s->allocation[i][j] * ((double)rand())/ (double)RAND_MAX;
       sum += request[j];
     }
@@ -141,7 +188,7 @@ void *process_thread(void *param)
   /* Process number */
   int i = (int) (long) param, j;
   /* Allocate request vector */
-  int *request = malloc(n*sizeof(int));
+  int *request = malloc(col*sizeof(int));
   while (1) {
     /* Generate request */
     generate_request(i, request);
@@ -164,40 +211,40 @@ int main(int argc, char* argv[])
   /* Get size of current state as input */
   int i, j;
   printf("Number of processes: \n");
-  scanf("%d", &m);
+  scanf("%d", &row);
   printf("Number of resources: \n");
-  scanf("%d", &n);
+  scanf("%d", &col);
 
 	printf("\tFINISHED LOADING IN NB PROCESSES AND RESOURCES\n");
 
   /* Allocate memory for state */
   s = (State *) malloc(sizeof(State));
-  s->resource 	= (int *) malloc(n*sizeof(int));
-  s->available	= (int *) malloc(n*sizeof(int));
-  s->max 				= (int **) malloc(m*sizeof(int));
-  s->allocation = (int **) malloc(m*sizeof(int));
-  s->need 			= (int **) malloc(m*sizeof(int));
+  s->resource 	= (int *) malloc(col*sizeof(int));
+  s->available	= (int *) malloc(col*sizeof(int));
+  s->max 				= (int **) malloc(row*sizeof(int));
+  s->allocation = (int **) malloc(row*sizeof(int));
+  s->need 			= (int **) malloc(row*sizeof(int));
   if (s == NULL) { printf("\nYou need to allocate memory for the state!\n"); exit(0); };
 
 	printf("\tFINISHED ALLOCATING SPACE FOR STATE\n");
 
   /* Get current state as input */
   printf("Resource vector: \n");
-  for(i = 0; i < n; i++)
+  for(i = 0; i < col; i++)
     scanf("%d", &s->resource[i]);
   printf("Enter max matrix: \n");
-  for(i = 0;i < m; i++) {
+  for(i = 0;i < row; i++) {
   	// Allocate the row
-  	s->max[i] = (int *) malloc(n*sizeof(int));
-    for(j = 0;j < n; j++) {
+  	s->max[i] = (int *) malloc(col*sizeof(int));
+    for(j = 0;j < col; j++) {
       	scanf("%d", &s->max[i][j]);
       }
     }
   printf("Enter allocation matrix: \n");
-  for(i = 0; i < m; i++) {
+  for(i = 0; i < row; i++) {
   	// Allocate the row
-  	s->allocation[i] = (int *) malloc(n*sizeof(int));
-    for(j = 0; j < n; j++) {
+  	s->allocation[i] = (int *) malloc(col*sizeof(int));
+    for(j = 0; j < col; j++) {
       scanf("%d", &s->allocation[i][j]);
     }
   }
@@ -206,46 +253,49 @@ int main(int argc, char* argv[])
   printf("\tFINISHED LOADING VECTORS AND MATRIXES\n");
 
   /* Calcuate the need matrix */
-  for(i = 0; i < m; i++) {
+  for(i = 0; i < row; i++) {
     // Allocate the row
-  	s->need[i] = (int *) malloc(n*sizeof(int));
-    for(j = 0; j < n; j++) {
+  	s->need[i] = (int *) malloc(col*sizeof(int));
+    for(j = 0; j < col; j++) {
       s->need[i][j] = s->max[i][j] - s->allocation[i][j];
     }
   }
 
   /* Calcuate the availability vector */
-  for(j = 0; j < n; j++) {
+  for(j = 0; j < col; j++) {
     int sum = 0;
-    for(i = 0; i < m; i++)
+    for(i = 0; i < row; i++)
       sum += s->allocation[i][j];
     s->available[j] = s->resource[j] - sum;
   }
 
   /* Output need matrix and availability vector */
   printf("Need matrix:\n");
-  for(i = 0; i < n; i++)
+  for(i = 0; i < col; i++)
     printf("R%d ", i+1);
   printf("\n");
-  for(i = 0; i < m; i++) {
-    for(j = 0; j < n; j++)
+  for(i = 0; i < row; i++) {
+    for(j = 0; j < col; j++)
       printf("%d  ",s->need[i][j]);
     printf("\n");
   }
   printAvailable();
 
   /* If initial state is unsafe then terminate with error */
-  
-
+  int safe = stateSafeCheck();
+	if (safe == 0)
+	{
+		return 1;
+	}
 
   /* Seed the random number generator */
   struct timeval tv;
   gettimeofday(&tv, NULL);
   srand(tv.tv_usec);
   
-  /* Create m threads */
-  pthread_t *tid = malloc(m*sizeof(pthread_t));
-  for (i = 0; i < m; i++)
+  /* Create row threads */
+  pthread_t *tid = malloc(row*sizeof(pthread_t));
+  for (i = 0; i < row; i++)
     pthread_create(&tid[i], NULL, process_thread, (void *) (long) i);
   
   /* Wait for threads to finish */
