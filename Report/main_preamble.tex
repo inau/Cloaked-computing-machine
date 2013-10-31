@@ -4,11 +4,13 @@
 \usepackage{enumitem}
 \usepackage[showframe=true]{geometry}
 \usepackage{changepage}
-\usepackage{listings}
+%\usepackage{listings}
+\usepackage{listingsutf8}
 \usepackage{color}
 \usepackage[toc,page]{appendix}
 \usepackage{booktabs}
 \usepackage{xcolor,colortbl}
+\usepackage{float}
 
 \lstdefinestyle{customc}{
   belowcaptionskip=1\baselineskip,
@@ -41,6 +43,7 @@
 \include{ch/intro}
 
 \include{ch/MultithreadedSum}
+\include{ch/ThreadsafeLinkedList}
 
 %\begin{appendices}
 %\include{ch/testing}

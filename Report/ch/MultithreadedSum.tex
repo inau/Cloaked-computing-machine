@@ -8,9 +8,24 @@
 \end{itemize}
 
 \section{Solution}
-we have used a code snippet from our course book(Operating System Concepts 9th edition P. 171) which we based our solution on.
+we have used a code snippet from our course book(Operating System Concepts 9th edition P. 171) which we based our solution on.\\
 
-The major alteration is in the form of us adding a struct to contain information about each processes 'workload', this way we pass them in as the runners arguments and can access them in the sub processes.
+The major alteration is in the form of us adding a struct to contain information about each processes 'workload', this way we pass them in as the runners argument and can access them in the sub processes.\\
+
+\section{Alternatives}
+Another solution could be to have every thread update the same counter. Memory wise we would not be forced to allocate space for every 'counter' but in regards to multiple processes reading and writing to the same resource the memory preservation would be a trade off for possible concurrency issues or waiting threads - which in the end might reduce performance.
+
+\section{Relevant code from sqrt.c}
+\subsection{Workload Struct}
+The idea is to provide the worker threads with a structure that describes the work to be done on the given thread and a place to store the given workers results.
+
+\lstinputlisting[xleftmargin=40.0px, language=C,numbers=left,linerange={10-14}, firstnumber=10]{code/sqrt.c}
+
+\subsection{Runnable code}
+The tricky part here was actually doing the cast, once that is done everything works smoothly.
+
+
+\lstinputlisting[xleftmargin=40.0px, language=C,numbers=left,linerange={94-110}, firstnumber=94]{code/sqrt.c}
 
 \section{Testing}
 
@@ -18,7 +33,7 @@ The major alteration is in the form of us adding a struct to contain information
 \definecolor{gr2}{gray}{0.85}
 
 
-\newcommand{\tblhead}[1] {
+\newcommand{\rowhead}[1] {
 \multicolumn{2}{l}{#1}\\
 \hline
 }
@@ -49,11 +64,11 @@ Threads: & #2 \\
 \hline
 }
 
-\begin{table}
+\begin{table}[h]
 \begin{tabular}{| p{\dimexpr.2\textwidth} | p{\dimexpr.5\textwidth-4\tabcolsep} |}
-\tblhead{Results}
+\rowhead{Results}
 \row{42}{33}
 \row{55}{666.99}
-\botrow{8934}{76}
+%\botrow{8934}{76}
 \end{tabular}
 \end{table}
