@@ -66,9 +66,9 @@ void *runner(void *param) {
 	*((int*)n->elm) = num++;
 	list_add(fifo, n);
 	
-	printf("L77: Going to sleep!\n");
+	printf(" Going to sleep!\n");
 	sleep(1); // Make the thread sleep in order to make way for some other ones.
-	printf("L79: Waking up from sleep\n");
+	printf(" Waking up from sleep\n");
 	
 	Node *n2 = list_remove(fifo);
 	if (n2 == NULL) { printf("Error no elements in list\n"); exit(-1);}
