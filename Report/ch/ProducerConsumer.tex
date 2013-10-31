@@ -1,0 +1,107 @@
+\chapter{Multithreaded Sum}
+
+\section{Requirements}
+
+\begin{itemize}
+\item Have a producer, producing n items
+\item Have a consumer, consuming n items
+\item Use multiple (POSIX) threads to do so
+\item Prevent the application from deadlocking
+\item Application must use the linked list from previous assignment
+\end{itemize}
+
+\section{Problem}
+
+The idea behind the consumer/producer problem is that it can deadlocks, where process A is waiting for process B, and process B is waiting for process A.\\
+
+In our example it would mean that the producer is waiting for the consumer to consume, and the consumer is waiting for the producer to produce.\\
+
+Another issue is that one may end up producing more items, than what was requested. This issue occurred to us, and we ended up fixing this with an additional check.
+The issue this problem occurs is because of so-called race-conditions.
+In our while loop (consumer-producer/main.c line 100), it may be possible that the while is passed, then another process is allowed to run, and the while becomes true again. This results in an extra product is being created.
+
+\section{Solution}
+Our solution is based on codesnippets from the lecture 6 slides.\\
+
+Our solution to the problem about line 100 is an additional check. This check is made after acquiring the locks.
+In case that we have created too many products, we simply release the locks, and break out of the loop. \\
+
+We have chosen to use semaphores in this assignment. Semaphores are atomic operations, that can change a value 1 up or down. As the operation is atomic, is it thread safe.
+
+\section{Alternatives}
+Another alternative would have been mutexes. We decided not to go with this solution, but seeing that we only wanted one particular thread to access the resource at a specific time semaphores was the ideal solution. 
+
+\section{Relevant code from main.c}
+\subsection{Semaphores}
+The semaphores gets initialized. 	
+Mutex is 1, allowing one of the processes to grab the key, and enter their loop. Full is set to 0, ensuring that the consumers are not running. The empty is set to buffer, allowing us to start the producer.\\
+
+\lstinputlisting[xleftmargin=40.0px, language=C,numbers=left,linerange={32-34}, firstnumber=32]{code/main.c}
+
+\subsection{Additional check}
+At line 103 our check is done after the locks are acquired. This ensures that we wont be making too many products. It is also important that you release the locks before you break the while loop, or you may end with a deadlock.
+
+
+\lstinputlisting[xleftmargin=40.0px, language=C,numbers=left,linerange={95-108}, firstnumber=95]{code/sqrt.c}
+
+\section{Testing}
+
+We will be testing if deadlocks are possible, as this is the major part of the assignment. This is done with whitebox testing by testing all of the code statements.\\
+
+The semaphores are initiated as described above. This is done in the main thread, and this means that only the producer is able to run first, as full is 0.
+
+Assuming 2 producers (P1 and P2) and 2 consumers (C1 and C2):
+P1 and P2 enters the while loop. P1 and P2 both acquires a empty lock. P1 also acquires the mutex lock. P2 must now wait for P1 to finish.
+Seeing the mutex lock is now taken, only P1 can touch the list. Eventually P1 is done, and unlocks the mutex and full lock. \\
+
+In the highly unlikely but plausible scenario that only P1 and P2 are running from now on, they would keep taking from the empty lock, until the buffer size is reached. They will now stop and wait for the consumer. (This is ensured because you request the empty lock before the mutex)\\
+
+The consumer is now allowed to start working. Depending on how many items that are created C1 and C2 will grab one each (if possible), and C1 or C2 will then grab the mutex lock. Let us assume that C1 got it.
+C1 consumes, and release the mutex and empty lock. 
+It is now possible for either C2 to continue (if it previously acquired a full lock), or that P1 and P2 will start creating a new product, this repeating this process. \\
+
+This ensures that our application will not deadlock.
+
+\definecolor{gr1}{gray}{0.65}
+\definecolor{gr2}{gray}{0.85}
+
+
+\newcommand{\rowhead}[1] {
+\multicolumn{2}{l}{#1}\\
+\hline
+}
+
+\newcommand{\row}[2] {
+\hline
+\rowcolor{gr1}
+Inputs&\\
+\hline \hline
+\rowcolor{gr2}
+Calculations: & #1 \\
+\hline
+\rowcolor{gr2}
+Threads: & #2 \\
+\hline \hline
+}
+
+\newcommand{\botrow}[2] {
+\hline
+\rowcolor{gr1}
+Inputs&\\
+\hline \hline
+\rowcolor{gr2}
+Calculations: & #1 \\
+\hline
+\rowcolor{gr2}
+Threads: & #2 \\
+\hline
+}
+
+\begin{table}[h]
+\begin{tabular}{| p{\dimexpr.2\textwidth} | p{\dimexpr.5\textwidth-4\tabcolsep} |}
+\rowhead{Results}
+\row{42}{33}
+\row{55}{666.99}
+%\botrow{8934}{76}
+\end{tabular}
+\end{table}
