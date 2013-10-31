@@ -14,7 +14,7 @@ typedef struct workload {
 } Workload;
 
 int main(int argc, char *argv[]) {
-    int start = time(NULL);
+    clock_t t1, t2; // Timers.
     pthread_t tid;
     pthread_attr_t attr;
 
@@ -34,6 +34,11 @@ int main(int argc, char *argv[]) {
     }
     int MAXPROCESSES = atoi(argv[2]);
     int MAXCALCS = atoi(argv[1]);
+    
+    if (MAXPROCESSES > MAXCALCS) {
+    	MAXPROCESSES = MAXCALCS;
+    	fprintf(stderr, "Too many threads according to calculations. Threads in use will be: %d\n", MAXCALCS);
+    }
 
     sum = 0;
 
@@ -53,22 +58,26 @@ int main(int argc, char *argv[]) {
     /* Get default attributes */
     pthread_attr_init(&attr);
 
-    int blocksize = (int) MAXCALCS / MAXPROCESSES;
-    printf("BlockSize per thread %d \n", blocksize);
-    int t = 0, i = 1;
+    
+    int t = 0, i = 0;
 
-    for (i; i < MAXCALCS + 1; i = i + blocksize) {
-        wlds[t]->_begin = i;
-        if (i + blocksize >= MAXCALCS) wlds[t]->_end = MAXCALCS + 1;
-        else {
-            wlds[t]->_end = i + blocksize;
-        }
+		t1 = clock(); // Get time.
 
-        /* Create the thread */
-        pthread_create(&tid, &attr, runner, wlds[t]);
-        tids[t++] = tid;
-        printf("T %d Id %d \n", t, (int) tid);
-    }
+	
+		for (i; i < MAXPROCESSES; i++) {
+			
+			int s = (int)(((float) MAXCALCS / (float) MAXPROCESSES)*(float)(i)+1.0);
+			int e = (int)(((float) MAXCALCS / (float) MAXPROCESSES)*(float)(i + 1));
+			printf("BlockSize for thread %d is %d\n", i, e-s+1);
+			
+			wlds[i]->_begin = s;
+			wlds[i]->_end = e;
+			
+			/* Create the thread */
+			pthread_create(&tid, &attr, runner, wlds[t]);
+      tids[t++] = tid;
+			printf("T %d Id %d \n", t, (int) tid);
+		}
 
     //Joining all the tids
     for (z = 0; z < MAXPROCESSES; z++) {
@@ -81,13 +90,15 @@ int main(int argc, char *argv[]) {
     for (z = 0; z < MAXPROCESSES; z++) {
         sum += wlds[z]->_result;
     }
+    
+    t2 = clock(); // Get time again.
 
     free(w);
 
     printf("sum = %f\n", sum);
-
-    int end = time(NULL);
-    printf("Time spent %d \n", (end - start));
+    
+    float diff = ((float)t2 - (float)t1)/CLOCKS_PER_SEC; // Get the difference between the timers.
+    printf("Time spent %f seconds \n", diff);
 }
 
 /* The thread will begin control in this function */
@@ -98,7 +109,7 @@ void *runner(void *param) {
 
     ((Workload*) param)->_result = 0;
 
-    for (i; i < upper; i++)
+    for (i; i <= upper; i++)
         ((Workload*) param)->_result += sqrt(i);
 
     printf("RUNNER [ Start: %d || End: %d || Result: %f ] \n", ((Workload*) param)->_begin, upper, ((Workload*) param)->_result);
