@@ -1,4 +1,4 @@
-\chapter{Multithreaded Sum}
+\chapter{Consumer Producer}
 
 \section{Requirements}
 
@@ -64,38 +64,6 @@ This ensures that our application will not deadlock.
 
 \definecolor{gr1}{gray}{0.65}
 \definecolor{gr2}{gray}{0.85}
-
-
-\newcommand{\rowhead}[1] {
-\multicolumn{2}{l}{#1}\\
-\hline
-}
-
-\newcommand{\row}[2] {
-\hline
-\rowcolor{gr1}
-Inputs&\\
-\hline \hline
-\rowcolor{gr2}
-Calculations: & #1 \\
-\hline
-\rowcolor{gr2}
-Threads: & #2 \\
-\hline \hline
-}
-
-\newcommand{\botrow}[2] {
-\hline
-\rowcolor{gr1}
-Inputs&\\
-\hline \hline
-\rowcolor{gr2}
-Calculations: & #1 \\
-\hline
-\rowcolor{gr2}
-Threads: & #2 \\
-\hline
-}
 
 \begin{table}[h]
 \begin{tabular}{| p{\dimexpr.2\textwidth} | p{\dimexpr.5\textwidth-4\tabcolsep} |}
