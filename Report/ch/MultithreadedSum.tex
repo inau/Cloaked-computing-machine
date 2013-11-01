@@ -38,20 +38,7 @@ The tricky part here was actually doing the cast, once that is done everything w
 \hline
 }
 
-\newcommand{\row}[2] {
-\hline
-\rowcolor{gr1}
-Inputs&\\
-\hline \hline
-\rowcolor{gr2}
-Calculations: & #1 \\
-\hline
-\rowcolor{gr2}
-Threads: & #2 \\
-\hline \hline
-}
-
-\newcommand{\botrow}[2] {
+\newcommand{\row}[3] {
 \hline
 \rowcolor{gr1}
 Inputs&\\
@@ -62,13 +49,33 @@ Calculations: & #1 \\
 \rowcolor{gr2}
 Threads: & #2 \\
 \hline
+\rowcolor{gr2}
+Time: & #3 \\
+\hline \hline
 }
 
-\begin{table}[h]
+\newcommand{\botrow}[3] {
+\hline
+\rowcolor{gr1}
+Inputs&\\
+\hline \hline
+\rowcolor{gr2}
+N = & #1 \\
+\hline
+\rowcolor{gr2}
+Threads: & #2 \\
+\hline
+\rowcolor{gr2}
+Time: & #3 \\
+\hline
+}
+
+\begin{table}[ht]
 \begin{tabular}{| p{\dimexpr.2\textwidth} | p{\dimexpr.5\textwidth-4\tabcolsep} |}
 \rowhead{Results}
-\row{42}{33}
-\row{55}{666.99}
-%\botrow{8934}{76}
+\row{100 000 000 000}{1}{8 seconds}
+\row{100 000 000 000}{2}{5 seconds}
+\row{100 000 000 000}{4}{4 seconds}
+\row{100 000 000 000}{8}{3 seconds}
 \end{tabular}
 \end{table}
