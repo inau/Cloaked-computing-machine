@@ -3,8 +3,8 @@ This assignment is about building a linked list which is thread safe, to avoid c
 
 \section{Requirements}
 \begin{itemize}
-\item Implement a FIFO buffer as a linked list in C.
-\item Make the list thread safe.
+\item Implement a FIFO buffer as a linked list in C
+\item Make the list thread safe
 \end{itemize}
 
 \section{Finishing the linked list}
@@ -41,3 +41,10 @@ We also found that we needed one mutex for both the add and remove function. If 
 We chose the easy way and made our mutex cover the whole section. By letting the mutex cover the much smaller section where length is changed and the last pointer is changed in both methods instead, the threads might be able to execute a bit faster, since the critical section would be smaller, but this also requires more testing and more thinking in order to be sure that it is as safe as our choice.\\
 
 \section{Testing}
+To be sure that the mutex locks were all placed correctly and that the race condition did not occur, we ran some tests.\\
+
+We mainly ran informal black box tests, which means we ran a test program using the list several times and checked the outcome. Tweaks have been made and the list re-tested.\\
+
+The test program run takes the number of threads to use for the program as input. It then divides the threads between creators and destroyers (half of each). The creators start creating elements for the list. The destroyers start removing elements from the list. We ran the program mostly with 10 threads, but different numbers have been tried. Elements are added and removed in the expected manner for all our tests, even when trying to remove an element from an empty list.\\
+
+We have also done some informal white box testing in the form of looking through the code and checking that the race condition shouldn't occur. Of course white box testing could also have been used to determine a more efficient way of placing the mutex locks, like described above. We chose the easiest way, since we aren't going to use this in time critical situations or the like.\\
