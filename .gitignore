@@ -6,3 +6,5 @@ Sqrt
 *.toc
 *.pdf
 *.log
+list/.cproject
+list/.project
