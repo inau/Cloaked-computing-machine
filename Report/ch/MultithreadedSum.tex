@@ -10,7 +10,7 @@
 \section{Solution}
 we have used a code snippet from our course book (Operating System Concepts 9th edition P. 171), which we based our solution on.\\
 
-The major alteration is in the form of us adding a struct to contain information about each processes 'workload', this way we pass them in as the runners argument and can access them in the sub processes.\\
+The major alteration is in the form of us adding a struct to contain information about each process' 'workload'. Then we pass them in as the runners argument and can access them from the processes.\\
 
 \section{Alternatives}
 Another solution could be to have every thread update the same counter. Memory wise we would not be forced to allocate space for every 'counter' but in regards to multiple processes reading and writing to the same resource the memory preservation would be a trade off for possible concurrency issues or waiting threads - which in the end might reduce performance.
