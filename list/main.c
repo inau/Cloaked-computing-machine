@@ -87,7 +87,7 @@ void *creator(void *param) {
 
 // Remove something from the list.
 void *destroyer(void *param) {
-  sleep((rand() % 3) + 1); // Make the thread sleep in order to make way for some other ones.
+  sleep((rand() % 2) + 1); // Make the thread sleep in order to make way for some other ones.
 
   Node *n = list_remove(fifo);
   if (n == NULL) { printf("No elements in list\n"); }
