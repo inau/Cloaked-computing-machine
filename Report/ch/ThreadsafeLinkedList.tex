@@ -3,11 +3,41 @@ This assignment is about building a linked list which is thread safe, to avoid c
 
 \section{Requirements}
 \begin{itemize}
-\item Implement a FIFO buffer
-\item Make the list thread safe
+\item Implement a FIFO buffer as a linked list in C.
+\item Make the list thread safe.
 \end{itemize}
 
+\section{Finishing the linked list}
+First part of the task was to finish the linked list. This was done by implementing the functions list\_add and list\_remove.\\
+
+These functions, like their names tell, add and remove a node from the list. In order for this to work as a FIFO the nodes added have to be placed in the opposite end from where they are removed.\\
+
+We place the nodes at then end, by using the List struct's last pointer, setting the current last node's next pointer to the new node and set the List's last pointer to the new node as well. In order to keep everything correct, we also increment the length counter in the List.\\
+
+When we remove a node from the list, we use the first pointer from the List struct. The root element is not to be removed (or used), so the actual first node of the list is the first pointer node's next. We then capture that node in a local variable and set the first pointer to the removed node's next. Because we are removing, we now count down the length count in the list and also make a check if we removed the last element. If so, we set the list's last pointer to first pointer.\\
+
+All the removing is of course only happening, if the length counter is above 0, in which case we have nodes in the list. The node removed is then returned.
+
+\section{Implications of using one list with several threads}
+The list as it was at this stage worked fine on a single thread, but everything has to be checked an extra time, when starting to work with more threads.\\
+
+Because the functions for adding and removing are running several expressions, saving intermediate results and working with pointers, the list is error prone, when using it with more than one thread.\\
+
+If the execution of a thread stops in between to expressions (or rather two commands in the machine code), the pointers and values read and written are wrong. We would have a race condition.\\
+
+The critical section of the code (where the race condition occurs) is during reading and then writing to the list's values, for instance changing a pointer. Pointers might not be set correctly, resulting in something, which isn't a list, but a lot of nodes pointing in weird directions and a list, where some nodes might not even be reachable.\\
+
+This can of course be fixed and we'll see into that in the next section.
+
 \section{Solution}
-To achieve 
+To make sure that a race condition does not occur, we would need to make the critical sections mutual exclusive, which means that only one thread can be inside the section at any given time. If a thread tries to enter the section, when there's already a thread inside, it should wait until that thread has exited the section.\\
+
+This can be done using mutexes and we used a C library called pthread, which has implementations for mutexes. The next step was to find out, where to use them and how many.\\
+
+First off the mutex couldn't be created inside the add and remove functions, since it would be a new mutex each time the method was called and therefore couldn't be used to exclude threads from other calls to the functions.\\
+
+We also found that we needed one mutex for both the add and remove function. If we had two different mutexes a thread calling add and another thread calling remove could access the list at the same time, which could turn out badly, for instance, when removing the last element, where we change the length and also tamper with the same pointers.\\
+
+We chose the easy way and made our mutex cover the whole section. By letting the mutex cover the much smaller section where length is changed and the last pointer is changed in both methods instead, the threads might be able to execute a bit faster, since the critical section would be smaller, but this also requires more testing and more thinking in order to be sure that it is as safe as our choice.\\
 
 \section{Testing}
