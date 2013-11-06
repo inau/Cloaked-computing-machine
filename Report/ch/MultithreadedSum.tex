@@ -28,16 +28,11 @@ The tricky part here was actually doing the cast, once that is done everything w
 \lstinputlisting[xleftmargin=40.0px, language=C,numbers=left,linerange={94-110}, firstnumber=94]{code/sqrt.c}
 
 \section{Testing}
-
+The tests are conducted on a Macbook pro with i7 (2.7 GHz), 16GB DDR3 ram, SSD drive.
 \definecolor{gr1}{gray}{0.65}
 \definecolor{gr2}{gray}{0.85}
 
-
-\newcommand{\rowhead}[1] {
-\multicolumn{2}{l}{#1}\\
-\hline
-}
-
+\subsection{Results}
 \newcommand{\row}[3] {
 \hline
 \rowcolor{gr1}
@@ -72,7 +67,6 @@ Time: & #3 \\
 
 \begin{table}[ht]
 \begin{tabular}{| p{\dimexpr.2\textwidth} | p{\dimexpr.5\textwidth-4\tabcolsep} |}
-\rowhead{Results}
 \row{100 000 000 000}{1}{8 seconds}
 \row{100 000 000 000}{2}{5 seconds}
 \row{100 000 000 000}{4}{4 seconds}
