@@ -1,0 +1,39 @@
+\chapter{Banker's Algorithm}
+This chapter is about Banker's algorithm. It's about testing the safety by simulating the allocation of resources for several processes/threads.
+
+\section{Requirements}
+\begin{itemize}
+\item Implement Banker's algorithm
+\begin{itemize}
+\item Check if state is secure
+\item Allocate and release resources for threads
+\end{itemize}
+\end{itemize}
+
+\section{Problem}
+The problem we try to solve is that resource allocation with more than one thread or process can end up deadlocking. For instance when one thread has allocated some of its needed resources but not all, and another thread has allocated the resources the first one needs, but it needs the resources allocated by the first one, both of them will wait indefinately until the other one releases the resources.
+
+\section{Solution}
+A solution to the problem is Banker's algorithm, which is a way to manage resource allocation. If done correctly, deadlocks will not happen. Also we implemented a security method that checks if the current state is safe.\\
+
+These two things together allows threads to allocate and release resources safely and keeping the state safe while doing so.\\
+
+We found some algorithms in the book(Operating System Concepts 9th edition P. 327-328), which we use for allocating resources and checking the safety of the state.
+
+\subsection{Resource allocation algorithm}
+Allocating resources is done in three steps, if we follow the algorithm on page 328 in the book mentioned above.\\
+
+Given a request vector Request\textsubscript{i} for the process P\textsubscript{i}, Process P\textsubscript{i} wants \textit{k} instances of resource type R\textsubscript{k} if Request\textsubscript{i}[\textit{j}] == \textit{k}.\\
+
+When a request for resources is made by process P\textsubscript{i}, the following actions will be taken:
+
+\subsubsection{Step 1:}
+If the process is requesting more resources than it needs, raise an error condition, else go to step 2. Request\textsubscript{i} <= Need\textsubscript{i}.
+
+\subsubsection{Step 2:}
+If the process is requesting more resources than are available, the process will have to wait, since there are no more resources. If resources are available, go to step 3.
+
+\subsubsection{Step 3:}
+Allocate the resources in order for 
+
+\section{Testing}
