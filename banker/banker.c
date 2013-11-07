@@ -14,6 +14,7 @@ typedef struct state {
 // Global variables
 int row, col;	// m = row, n = col
 State *s = NULL;
+pthread_mutex_t lock;
 
 // Print available vector.
 void printAvailable() {
@@ -68,19 +69,27 @@ int stateSafeCheck() {
   		work[i] = s->available[i];
   	}
   }
-  
+  // Step 2.
   for (i = 0; i < row; i++) {
-  	for (j = 0; j < col; j++)
-  	{
-  		// Step 2.
-  		if (finish[i] == 0 && s->need[i][j] <= work[j]) {
-  			// Step 3.
-  			work[j] = work[j] + s->allocation[i][j];
-  			finish[i] = 1;
-  		} else {
-  			break; // Goto step 4 (not safe).
-  		}
-  	}
+		if (finish[i] == 0)
+		{
+			for (j = 0; j < col; j++)
+			{
+				if (s->need[i][j] > work[j])
+				{
+					break;
+				}
+			}
+			if (j == col)
+			{
+				// Step 3.
+				for (j = 0; j < col; j += 1)
+				{
+					work[j] = work[j] + s->allocation[i][j];
+				}
+				finish[i] = 1;
+			}
+		}
   }
   
   // Step 4
@@ -103,12 +112,12 @@ int stateSafeCheck() {
    results in a safe state and return 1, else return 0 */
 int resource_request(int i, int *request)
 {
-
+	printf("Process %d: ",i);
 	printRequest(request);
-	if (stateSafeCheck() == 0)
+	/*if (stateSafeCheck() == 0)
 	{
 		return 0;
-	}
+	}*/
 	int j;
 	for (j = 0; j < col; j++) {
 		// Step 1.
@@ -125,13 +134,30 @@ int resource_request(int i, int *request)
 			//ERROR
 			printf("No resources are available, therefore the process must wait!\n");
 			sleep(100);
-		}
-		
+		}		
+	}
+
+	pthread_mutex_lock(&lock); // Lock the mutex.
+	for (j = 0; j < col; j += 1)
+	{
 		// Step 3.
 		s->available[j] -= request[j];
-		s->allocation[i][j] -= request[j];
+		s->allocation[i][j] += request[j];
 		s->need[i][j] -= request[j];
 	}
+	
+	if (stateSafeCheck() == 0)
+	{
+		for (j = 0; j < col; j += 1)
+		{
+			s->available[j] += request[j];
+			s->allocation[i][j] -= request[j];
+			s->need[i][j] += request[j];
+		}
+		pthread_mutex_unlock(&lock); // Lock the mutex.
+		return 0;
+	}
+	pthread_mutex_unlock(&lock); // Lock the mutex.
 	
 	printAvailable();
 	
@@ -146,11 +172,13 @@ void resource_release(int i, int *request)
 	printf("RELEASING RESOURCES!\n");
 	printRequest(request);
 	int j;
+	pthread_mutex_lock(&lock); // Lock the mutex.
 	for (j = 0; j < col; j++) {
-		s->available[j] -= request[j];
+		s->available[j] += request[j];
 		s->allocation[i][j] -= request[j];
-		s->need[i][j] -= request[j];
+		s->need[i][j] += request[j];
 	}
+	pthread_mutex_unlock(&lock); // Unlock the mutex.
 	
 	printAvailable();
 	
@@ -208,6 +236,9 @@ void *process_thread(void *param)
 
 int main(int argc, char* argv[])
 {
+	// Initialize the mutex lock.
+  pthread_mutex_init(&lock,NULL);
+  
   /* Get size of current state as input */
   int i, j;
   printf("Number of processes: \n");
