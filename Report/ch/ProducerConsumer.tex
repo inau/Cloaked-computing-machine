@@ -12,24 +12,30 @@
 
 \section{Problem}
 
-The idea behind the consumer/producer problem is that it can deadlocks, where process A is waiting for process B, and process B is waiting for process A.\\
+The idea behind the consumer/producer problem is that it can deadlock, where process A is waiting for process B, and process B is waiting for process A.\\
+
+
 
 In our example it would mean that the producer is waiting for the consumer to consume, and the consumer is waiting for the producer to produce.\\
 
 Another issue is that one may end up producing more items, than what was requested. This issue occurred to us, and we ended up fixing this with an additional check.
-The issue this problem occurs is because of so-called race-conditions.
-In our while loop (consumer-producer/main.c line 100), it may be possible that the while is passed, then another process is allowed to run, and the while becomes true again. This results in an extra product is being created.
+The reason this problem occurs is because of so-called race-conditions.
+In our while loop (consumer-producer/main.c line 100), it may be possible that one thread passes the condition, then another thread is allowed to run, and the condition becomes true again. This results in an extra product being created.
 
 \section{Solution}
-Our solution is based on codesnippets from the lecture 6 slides.\\
+Our solution is based on codesnippets from the lecture 6 slides.
+We have chosen to use semaphores in this assignment. Semaphores are atomic operations, that can change a value 1 up or down. As the operation is atomic, is it thread safe. The nice feature about semaphores is that we can initialize it to something other than 0 or 1, example buffersize which allows us to produce more than 1 product before consuming it.
+\\
+
+
 
 Our solution to the problem about line 100 is an additional check. This check is made after acquiring the locks.
 In case that we have created too many products, we simply release the locks, and break out of the loop. \\
 
-We have chosen to use semaphores in this assignment. Semaphores are atomic operations, that can change a value 1 up or down. As the operation is atomic, is it thread safe.
+
 
 \section{Alternatives}
-Another alternative would have been mutexes. We decided not to go with this solution, but seeing that we only wanted one particular thread to access the resource at a specific time the use of semaphores was the ideal solution.
+Another alternative would have been mutexes. We decided not to go with this solution, but seeing that sempahores offered the functionality that its value could be > 1 we chose this solution. The mutexes could have been implemented by using another variable.
 
 \section{Relevant code from main.c}
 \subsection{Semaphores}
@@ -42,7 +48,7 @@ Mutex is 1, allowing one of the processes to grab the key, and enter their loop.
 At line 103 our check is done after the locks are acquired. This ensures that we wont be making too many products. It is also important that you release the locks before you break the while loop, or you may end with a deadlock.
 
 
-\lstinputlisting[xleftmargin=40.0px, language=C,numbers=left,linerange={95-108}, firstnumber=95]{code/sqrt.c}
+\lstinputlisting[xleftmargin=40.0px, language=C,numbers=left,linerange={95-108}, firstnumber=95]{code/main.c}
 
 \section{Testing}
 
@@ -54,7 +60,7 @@ Assuming 2 producers (P1 and P2) and 2 consumers (C1 and C2):
 P1 and P2 enters the while loop. P1 and P2 both acquires a empty lock. P1 also acquires the mutex lock. P2 must now wait for P1 to finish.
 Seeing the mutex lock is now taken, only P1 can touch the list. Eventually P1 is done, and unlocks the mutex and full lock. \\
 
-In the highly unlikely but plausible scenario that only P1 and P2 are running from now on, they would keep taking from the empty lock, until the buffer size is reached. They will now stop and wait for the consumer. (This is ensured because you request the empty lock before the mutex)\\
+In the highly unlikely but plausible scenario that only P1 and P2 are running from now on, they would keep taking from the empty lock, until the 0 is reached. They will now stop and wait for the consumer. (This is ensured because you request the empty lock before the mutex)\\
 
 The consumer is now allowed to start working. Depending on how many items that are created C1 and C2 will grab one each (if possible), and C1 or C2 will then grab the mutex lock. Let us assume that C1 got it.
 C1 consumes, and release the mutex and empty lock. 
