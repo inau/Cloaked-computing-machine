@@ -23,7 +23,7 @@ The list as it was at this stage worked fine on a single thread, but everything 
 
 Because the functions for adding and removing are running several expressions, saving intermediate results and working with pointers, the list is error prone, when using it with more than one thread.\\
 
-If the execution of a thread stops in between to expressions (or rather two commands in the machine code), the pointers and values read and written are wrong. We would have a race condition.\\
+If the execution of a thread stops in between two expressions (or rather two commands in the machine code), the pointers and values read and written are wrong. This would be a race condition.\\
 
 The critical section of the code (where the race condition occurs) is during reading and then writing to the list's values, for instance changing a pointer. Pointers might not be set correctly, resulting in something, which isn't a list, but a lot of nodes pointing in weird directions and a list, where some nodes might not even be reachable.\\
 
@@ -36,7 +36,7 @@ This can be done using mutexes and we used a C library called pthread, which has
 
 First off the mutex couldn't be created inside the add and remove functions, since it would be a new mutex each time the method was called and therefore couldn't be used to exclude threads from other calls to the functions.\\
 
-We also found that we needed one mutex for both the add and remove function. If we had two different mutexes a thread calling add and another thread calling remove could access the list at the same time, which could turn out badly, for instance, when removing the last element, where we change the length and also tamper with the same pointers.\\
+We also found that we needed only one mutex shared between the add and remove function. If we had two different mutexes a thread calling add and another thread calling remove could access the list at the same time, which could turn out badly, for instance, when removing the last element, where we change the length and also tamper with the same pointers.\\
 
 We chose the easy way and made our mutex cover the whole section. By letting the mutex cover the much smaller section where length is changed and the last pointer is changed in both methods instead, the threads might be able to execute a bit faster, since the critical section would be smaller, but this also requires more testing and more thinking in order to be sure that it is as safe as our choice.\\
 
@@ -45,6 +45,6 @@ To be sure that the mutex locks were all placed correctly and that the race cond
 
 We mainly ran informal black box tests, which means we ran a test program using the list several times and checked the outcome. Tweaks have been made and the list re-tested.\\
 
-The test program run takes the number of threads to use for the program as input. It then divides the threads between creators and destroyers (half of each). The creators start creating elements for the list. The destroyers start removing elements from the list. We ran the program mostly with 10 threads, but different numbers have been tried. Elements are added and removed in the expected manner for all our tests, even when trying to remove an element from an empty list.\\
+The test program takes the number of threads to use for the program as input. It then divides the threads between creators and destroyers (half of each). The creators start creating elements for the list. The destroyers start removing elements from the list. We ran the program mostly with 10 threads, but different numbers have been tried. Elements are added and removed in the expected manner for all our tests, even when trying to remove an element from an empty list.\\
 
 We have also done some informal white box testing in the form of looking through the code and checking that the race condition shouldn't occur. Of course white box testing could also have been used to determine a more efficient way of placing the mutex locks, like described above. We chose the easiest way, since we aren't going to use this in time critical situations or the like.\\
