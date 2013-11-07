@@ -1,5 +1,5 @@
 \chapter{Multithreaded Sum}
-The issues encountered in this exercise are related to concurrency. One ought to keep in mind the problems when doing parallel computations. In this case we should consider how to handle the memory when splitting one computation into multiple to benefit from modern CPUs. 
+The issues encountered in this exercise are related to concurrency. One ought to keep in mind the problems occurring when doing parallel programming. In this case we should consider how to handle the memory when splitting the process into multiple to benefit from modern CPUs. 
 
 \section{Requirements}
 The program is supposed to support following:
@@ -11,10 +11,13 @@ The program is supposed to support following:
 \section{Solution}
 We have used a code snippet from our course book(Operating System Concepts 9th edition P. 171) which we based our solution on.\\
 
-The major alteration is in the form of us adding a struct to contain information about each process' 'workload'. Then we pass them in as the runners argument and can access them from the processes.\\
+The major alteration is in the form of us adding a struct to contain information about each processes 'workload', this way we pass them in as the runners argument and can access them in the sub processes.\\
 
 \section{Alternatives}
 Another solution could be to have every thread update the same counter. Memory wise we would not be forced to allocate space for every 'counter' but in regards to multiple processes reading and writing to the same resource the memory preservation would be a trade off for possible concurrency issues or waiting threads - which in the end might reduce performance.
+
+\section{Conclusion}
+
 
 \section{Relevant code from sqrt.c}
 \subsection{Workload Struct}
@@ -29,11 +32,16 @@ The tricky part here was actually doing the cast, once that is done everything w
 \lstinputlisting[xleftmargin=40.0px, language=C,numbers=left,linerange={94-110}, firstnumber=94]{code/sqrt.c}
 
 \section{Testing}
-The tests are conducted on a Macbook pro with i7 (2.7 GHz), 16GB DDR3 ram, SSD drive.
+
 \definecolor{gr1}{gray}{0.65}
 \definecolor{gr2}{gray}{0.85}
 
-\subsection{Results}
+
+\newcommand{\rowhead}[1] {
+\multicolumn{2}{l}{#1}\\
+\hline
+}
+
 \newcommand{\row}[3] {
 \hline
 \rowcolor{gr1}
@@ -68,9 +76,13 @@ Time: & #3 \\
 
 \begin{table}[ht]
 \begin{tabular}{| p{\dimexpr.2\textwidth} | p{\dimexpr.5\textwidth-4\tabcolsep} |}
+\rowhead{Results}
 \row{100 000 000 000}{1}{8 seconds}
 \row{100 000 000 000}{2}{5 seconds}
 \row{100 000 000 000}{4}{4 seconds}
 \row{100 000 000 000}{8}{3 seconds}
 \end{tabular}
 \end{table}
+
+We can see that when assigning more threads for the same number of calculations, the actual time the computation takes is reduced.
+This is according to what one would expect when assigning multiple processes to do the same calculation.
