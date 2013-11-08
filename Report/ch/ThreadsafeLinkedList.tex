@@ -10,13 +10,23 @@ This assignment is about building a linked list which is thread safe, to avoid c
 \section{Finishing the linked list}
 First part of the task was to finish the linked list. This was done by implementing the functions list\_add and list\_remove.\\
 
-These functions, like their names tell, add and remove a node from the list. In order for this to work as a FIFO the nodes added have to be placed in the opposite end from where they are removed.\\
+These aforementioned functions add or remove a node from the list. In order for the list to work as a FIFO, the first element added is always the first element to be removed - similar to a queue at a store.\\
 
-We place the nodes at then end, by using the List struct's last pointer, setting the current last node's next pointer to the new node and set the List's last pointer to the new node as well. In order to keep everything correct, we also increment the length counter in the List.\\
+When adding a node to the list, following steps are completed
+\begin{itemize}
+\item The list struct contains a last pointer, the node referenced has its next pointer set to the new node
+\item The lists last pointer is set to the new node
+\item The lists length counter is incremented\\
+\end{itemize}
 
-When we remove a node from the list, we use the first pointer from the List struct. The root element is not to be removed (or used), so the actual first node of the list is the first pointer node's next. We then capture that node in a local variable and set the first pointer to the removed node's next. Because we are removing, we now count down the length count in the list and also make a check if we removed the last element. If so, we set the list's last pointer to first pointer.\\
-
-All the removing is of course only happening, if the length counter is above 0, in which case we have nodes in the list. The node removed is then returned.
+When removing a node from the list following steps are executed
+\begin{itemize}
+\item The list struct contains a pointer to the first element, this is the root element (We always have a root element which is not to be altered, the root nodes next element is the 'first' element, lets refer to this as N\textsubscript{0})
+\item The first element N\textsubscript{0} is stored in a local variable
+\item We set the lists first pointers next element to the N\textsubscript{0} elements next pointer
+\item We decrement the list counter
+\end{itemize}
+Above steps are taken if the condition count $>$ 0 holds.\\
 
 \section{Implications of using one list with several threads}
 The list as it was at this stage worked fine on a single thread, but everything has to be checked an extra time, when starting to work with more threads.\\

@@ -16,18 +16,14 @@ The major alteration is in the form of us adding a struct to contain information
 \section{Alternatives}
 Another solution could be to have every thread update the same counter. Memory wise we would not be forced to allocate space for every 'counter' but in regards to multiple processes reading and writing to the same resource the memory preservation would be a trade off for possible concurrency issues or waiting threads - which in the end might reduce performance.
 
-\section{Conclusion}
-
-
 \section{Relevant code from sqrt.c}
 \subsection{Workload Struct}
-The idea is to provide the worker threads with a structure that describes the work to be done on the given thread and a place to store the given workers results.
+The idea is to provide the worker threads with a structure that describes the work to be done on the given thread and a place to store the given workers results.\\
 
 \lstinputlisting[xleftmargin=40.0px, language=C,numbers=left,linerange={10-14}, firstnumber=10]{code/sqrt.c}
 
 \subsection{Runnable code}
-The tricky part here was actually doing the cast, once that is done everything works smoothly.
-
+The tricky part here was actually doing the cast, once that is done everything works smoothly.\\
 
 \lstinputlisting[xleftmargin=40.0px, language=C,numbers=left,linerange={94-110}, firstnumber=94]{code/sqrt.c}
 
@@ -35,7 +31,6 @@ The tricky part here was actually doing the cast, once that is done everything w
 The tests have been conducted on a Macbook Pro running Core i7 (2.7 GHz) with 16 GB DDR3 RAM and a SSD drive.
 \definecolor{gr1}{gray}{0.65}
 \definecolor{gr2}{gray}{0.85}
-
 
 \newcommand{\rowhead}[1] {
 \multicolumn{2}{l}{#1}\\
@@ -84,5 +79,8 @@ Time: & #3 \\
 \end{tabular}
 \end{table}
 
+\section{Conclusion}
 We can see that when assigning more threads for the same number of calculations, the actual time the computation takes is reduced.
-This is according to what one would expect when assigning multiple processes to do the same calculation.
+This is according to what one would expect when assigning multiple processes to do the same calculation.\\
+
+Another interesting thing is that one would expect the time to be halved each time the amount of threads is doubled, this is not the case. This is most likely due to us running an OS, some background processes etc., which means we are not sure that we get full CPU utilization for our specific program. Hence the time may vary for each individual execution of our program.

@@ -16,7 +16,7 @@ The problem we try to solve is that resource allocation with more than one threa
 \section{Solution}
 A solution to the problem is Banker's algorithm, which is a way to manage resource allocation. If done correctly, deadlocks will not happen. Also we implemented a security method that checks if the current state is safe.\\
 
-These two things together allows threads to allocate and release resources safely and keeping the state safe while doing so.\\
+These two things together allow threads to allocate and release resources safely and keeping the state safe while doing so.\\
 
 We found some algorithms in the book(Operating System Concepts 9th edition P. 327-328), which we use for allocating resources and checking the safety of the state.
 
@@ -28,7 +28,7 @@ Given a request vector Request\textsubscript{i} for the process P\textsubscript{
 When a request for resources is made by process P\textsubscript{i}, the following actions will be taken:
 
 \subsubsection{Step 1:}
-If the process is requesting more resources than it needs, raise an error condition, else go to step 2. Request\textsubscript{i} <= Need\textsubscript{i}.
+If the process is requesting more resources than it needs, raise an error condition, else go to step 2. Request\textsubscript{i} $<=$ Need\textsubscript{i}.
 
 \subsubsection{Step 2:}
 If the process is requesting more resources than are available, the process will have to wait, since there are no more resources. If resources are available, go to step 3.
@@ -37,3 +37,6 @@ If the process is requesting more resources than are available, the process will
 Allocate the resources in order for 
 
 \section{Testing}
+The testing consist of a simulation, where we look at the provided data during the simulation and assure that it is corresponding to the expected behaviour.
+
+We have the system print the state of the allocation graph for the given process, its request vector, the availability vector and the state in which the system is after the operation.

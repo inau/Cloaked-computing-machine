@@ -24,7 +24,7 @@ In our while loop (consumer-producer/main.c line 100), it may be possible that o
 
 \section{Solution}
 Our solution is based on codesnippets from the lecture 6 slides.
-We have chosen to use semaphores in this assignment. Semaphores are atomic operations, that can change a value 1 up or down. As the operation is atomic, is it thread safe. The nice feature about semaphores is that we can initialize it to something other than 0 or 1, example buffersize which allows us to produce more than 1 product before consuming it.
+We have chosen to use semaphores in this assignment. Semaphores are atomic operations, that can change a value 1 up or down. As the operation is atomic it is thread safe. The nice feature about semaphores is that we can initialize it to something other than 0 or 1, example buffersize which allows us to produce more than 1 product before consuming it.
 \\
 
 
@@ -35,7 +35,7 @@ In case that we have created too many products, we simply release the locks, and
 
 
 \section{Alternatives}
-Another alternative would have been mutexes. We decided not to go with this solution, but seeing that sempahores offered the functionality that its value could be > 1 we chose this solution. The mutexes could have been implemented by using another variable.
+Another alternative would have been mutexes. We decided not to go with this solution, seeing that sempahores offered the functionality that its value could be $>$ 1 we chose this solution. The mutexes could have been implemented by using another variable.
 
 \section{Relevant code from main.c}
 \subsection{Semaphores}
@@ -57,13 +57,13 @@ We will be testing if deadlocks are possible, as this is the major part of the a
 The semaphores are initiated as described above. This is done in the main thread, and this means that only the producer is able to run first, as full is 0.
 
 Assuming 2 producers (P1 and P2) and 2 consumers (C1 and C2):
-P1 and P2 enters the while loop. P1 and P2 both acquires a empty lock. P1 also acquires the mutex lock. P2 must now wait for P1 to finish.
+P1 and P2 enters the while loop. P1 and P2 both acquire an empty lock. P1 also acquires the mutex lock. P2 must now wait for P1 to finish.
 Seeing the mutex lock is now taken, only P1 can touch the list. Eventually P1 is done, and unlocks the mutex and full lock. \\
 
 In the highly unlikely but plausible scenario that only P1 and P2 are running from now on, they would keep taking from the empty lock, until the 0 is reached. They will now stop and wait for the consumer. (This is ensured because you request the empty lock before the mutex)\\
 
 The consumer is now allowed to start working. Depending on how many items that are created C1 and C2 will grab one each (if possible), and C1 or C2 will then grab the mutex lock. Let us assume that C1 got it.
 C1 consumes, and release the mutex and empty lock. 
-It is now possible for either C2 to continue (if it previously acquired a full lock), or that P1 and P2 will start creating a new product, this repeating this process. \\
+It is now possible for either C2 to continue (if it previously acquired a full lock), or that P1 and P2 will start creating a new product, thus repeating this process. \\
 
 This ensures that our application will not deadlock.
