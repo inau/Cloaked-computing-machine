@@ -154,10 +154,10 @@ int resource_request(int i, int *request)
 			s->allocation[i][j] -= request[j];
 			s->need[i][j] += request[j];
 		}
-		pthread_mutex_unlock(&lock); // Lock the mutex.
+		pthread_mutex_unlock(&lock); // Unlock the mutex.
 		return 0;
 	}
-	pthread_mutex_unlock(&lock); // Lock the mutex.
+	pthread_mutex_unlock(&lock); // Unlock the mutex.
 	
 	printAvailable();
 	
