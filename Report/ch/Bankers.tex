@@ -34,7 +34,18 @@ If the process is requesting more resources than it needs, raise an error condit
 If the process is requesting more resources than are available, the process will have to wait, since there are no more resources. If resources are available, go to step 3.
 
 \subsubsection{Step 3:}
-Allocate the resources in order for 
+Allocate the resources the process is asking for, by modifying the state:
+\begin{align*}
+Available    &= Available-Request_i\\
+Allocation_i &= Allocation_i + Request_i\\
+Need_i       &= Need_i - Request_i
+\end{align*}
+After allocation the state should be safe, but a check is nessecary. If the check fails then the allocation should be undone and the function should raise an error condition. If it is safe, the allocation was completed.
+
+\lstinputlisting[xleftmargin=40.0px, language=C, numbers=left, linerange={111-167}, firstnumber=111, breaklines=true, showspaces=false, showstringspaces=false]{code/banker.c}
+
+\subsection{State safety algorithm}
+
 
 \section{Testing}
 The testing consist of a simulation, where we look at the provided data during the simulation and assure that it is corresponding to the expected behaviour.
