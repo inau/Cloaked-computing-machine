@@ -45,9 +45,45 @@ After allocation the state should be safe, but a check is nessecary. If the chec
 \lstinputlisting[xleftmargin=40.0px, language=C, numbers=left, linerange={111-167}, firstnumber=111, breaklines=true, showspaces=false, showstringspaces=false]{code/banker.c}
 
 \subsection{State safety algorithm}
+To ensure the system's safety, we implement Banker's safety algorithm, which checks the current state for errors and reports back. This algorithm is also described in the book(Operating System Concepts 9th edition P. 327-328) with 4 steps, which we will explain below:
 
+\subsubsection{Step 1:}
+First we create two new vectors; \textit{Work} and \textit{Finish}, where \textit{Work}'s length is the number of columns (resources) and \textit{Finish}' length is the number of rows (processes).\\
+
+We then initialize \textit{Work} to be the same as the state's \textit{Available} vector and set all \textit{Finish}' values to false (here 0).\\
+
+In order for the state to be deemed safe, we go through some checks, which if safe, set the Finish value for the safe process just checked to true (here 1). The next steps consists of the checks and the assignments and the last step checks if all states are safe.
+
+\subsubsection{Step 2:}
+The check if the state is safe corresponding to each process runs in a loop and goes as follows:\\
+
+We try to find an index \textit{i} such that both
+
+\begin{itemize}
+\item $Finish[i]== false$
+\item $Need_i <= Work$
+\end{itemize}
+
+If we can't find such an \textit{i}, we continue to step 4, which means that the safety check will fail. If the check goes through, we go to the next step.
+
+\subsubsection{Step 3:}
+We now change work and set Finish for current i to true, like this:
+
+\begin{itemize}
+\item $Work = Work + Allocation_i$
+\item $Finish[i] = true$
+\end{itemize}
+
+After this, we go to step 2 again for the next i in the loop.
+
+\subsubsection{Step 4:}
+When we've looped through step 2 and 3 until finished or until we jumped to step 4 at the end of step 2, we want to check if all the entries in the \textit{Finish} vector are set to true (here 1). If it is, the state is safe, else it isn't.\\
+
+The function we've made which uses this algoritm returns 1 if the state is safe and 0 otherwise. This is then used when checking the initial state and also when processes are requesting resources to check if the state following the allocation is safe or else we backtrack.
 
 \section{Testing}
-The testing consist of a simulation, where we look at the provided data during the simulation and assure that it is corresponding to the expected behaviour.
+The testing consists of a simulation, where we look at the provided data during the simulation and assure that it is corresponding to the expected behaviour.
 
-We have the system print the state of the allocation graph for the given process, its request vector, the availability vector and the state in which the system is after the operation.
+The simulation program is made to print the available vector and the resource request vector in order for us to check the results. The testing made is almost purely informal black box testing. Of course we also went through some informal white box testing, finding the critical areas etc.\\
+
+When the program is run, it will continue indefinately; acquirering and releasing resources to the system. This is alse what should happen in the simulation and therefore we see the tests so far as a success.\\
